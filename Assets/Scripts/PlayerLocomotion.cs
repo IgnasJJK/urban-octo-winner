@@ -23,6 +23,8 @@ public class PlayerLocomotion : MonoBehaviour
     float inAirTime = 0;
     float inAirJumps = 0;
 
+    Quaternion targetRotation;
+
     bool coyoteJumped;
 
     InputAction movementAction;
@@ -34,6 +36,8 @@ public class PlayerLocomotion : MonoBehaviour
 
         movementAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
+
+        targetRotation = transform.rotation;
 
 #if UNITY_EDITOR
         if (cameraObj == null)
@@ -111,6 +115,8 @@ public class PlayerLocomotion : MonoBehaviour
         movementDelta.y += verticalVelocity * Time.deltaTime;
 #endregion
 
+        capsuleObj.transform.localRotation = Quaternion.Lerp(capsuleObj.transform.rotation, targetRotation, 0.1f);
+
         controller.Move(movementDelta);
     }
 
@@ -121,30 +127,45 @@ public class PlayerLocomotion : MonoBehaviour
     [SerializeField] float sillyMagnitude = 0.2f;
     float movementAnimationTimer = 0f;
 
+    bool isMoving = false;
+
+
     private void DoSillyMovementAnimation(Vector2 movement)
     {
         if (capsuleObj == null) return;
 
+        Vector3 forward = cameraObj.transform.forward;
+        forward.y = 0;
+
+
         if (movement == Vector2.zero || inAirTime > 0.1f)
         {
-            movementAnimationTimer = 0;
+            // Apply once
+            if (isMoving)
+            {
+                movementAnimationTimer = 0;
+                targetRotation = Quaternion.LookRotation(forward);
+                isMoving = false;
+            }
+            // Apply continuosly
             capsuleObj.transform.localPosition = Vector3.Lerp(capsuleObj.transform.localPosition, Vector3.zero, 0.1f);
-            capsuleObj.transform.localRotation = Quaternion.Lerp(capsuleObj.transform.rotation, Quaternion.identity, 0.1f);
             return;
         }
 
+        isMoving = true;
+
         movementAnimationTimer += Time.deltaTime;
 
-        float magnitude = Mathf.Sin(movementAnimationTimer * 10f);
-        float magnitudeB = Mathf.Sin(movementAnimationTimer * 10f + Mathf.PI);
+        float mA = Mathf.Sin(movementAnimationTimer * 10f);
+        float mB = Mathf.Sin(movementAnimationTimer * 10f + Mathf.PI);
 
-        Vector3 forward = cameraObj.transform.forward;
-        forward.y = 0;
-        capsuleObj.transform.localRotation = Quaternion.Lerp(
-            capsuleObj.transform.localRotation,
-            Quaternion.Euler(0, 0, sillyAngle * magnitude) * Quaternion.LookRotation(forward), 0.1f);
+        // FIXME: Semi-working hack here. Wobble doesn't quite work right when facing in X or -X direction.
+        float forwardDir = Vector3.Dot(forward, Vector3.forward);
+        forwardDir = forwardDir >= 0 ? 1 : -1;
 
-        capsuleObj.transform.localPosition = new Vector3(magnitudeB * sillyWobble, Mathf.Abs(magnitude * sillyMagnitude), 0);
+        targetRotation = Quaternion.LookRotation(forward) * Quaternion.Euler(0, 0, forwardDir*mA*sillyAngle);
+
+        capsuleObj.transform.localPosition = new Vector3(mB*sillyWobble, Mathf.Abs(mA*sillyMagnitude), 0);
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
