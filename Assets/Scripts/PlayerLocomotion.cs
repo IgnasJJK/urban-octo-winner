@@ -1,15 +1,20 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class PlayerLocomotion : MonoBehaviour
 {
-    CharacterController controller;
 
+    CharacterController controller;
+    [SerializeField] GameObject cameraObj;
+
+    [Header("Movement")]
     [SerializeField] float movementSpeed = 10f;
     [SerializeField] float gravity = 9.81f;
-
+    [Header("Interaction")]
     [SerializeField] float pushStrength = 10.0f;
+    [Header("Jump")]
     [SerializeField] float jumpStrength = 5.0f;
-
     [SerializeField] float coyoteTime = 0.2f;
     [SerializeField] float maxAirJumpCount = 2;
 
@@ -19,19 +24,50 @@ public class PlayerLocomotion : MonoBehaviour
 
     bool coyoteJumped;
 
+    InputAction movementAction;
+    InputAction jumpAction;
+
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
+
+        movementAction = InputSystem.actions.FindAction("Move");
+        jumpAction = InputSystem.actions.FindAction("Jump");
+
+#if UNITY_EDITOR
+        if (cameraObj == null)
+        {
+            Debug.LogWarning("Camera reference not set on '" + gameObject.name + "'.");
+        }
+#endif
     }
 
     void Update()
     {
+#if UNITY_EDITOR
+        Vector3 forward, right;
+        if (cameraObj == null)
+        {
+            forward = transform.forward;
+            right = transform.right;
+        }
+        else
+        {
+            forward = cameraObj.transform.forward;
+            right = cameraObj.transform.right;
+        }
+#else
+        Vector3 forward = cameraObj.transform.forward;
+        Vector3 right = cameraObj.transform.right;
+#endif
+        forward.y = right.y = 0;
+        forward.Normalize();
+        right.Normalize();
 
-        float v = Input.GetAxis("Vertical");
-        float h = Input.GetAxis("Horizontal");
+        Vector2 movement = movementAction.ReadValue<Vector2>();
+        Vector3 movementDelta = (movement.y * forward + movement.x * right) * movementSpeed * Time.deltaTime;
 
-        Vector3 movementDelta = (v * transform.forward + h * transform.right) * movementSpeed * Time.deltaTime;
-        
 #region Vertical movement, jumps
         if (controller.isGrounded)
         {
@@ -49,7 +85,7 @@ public class PlayerLocomotion : MonoBehaviour
         }
 
         // Calculate vertical velocity from jumping
-        if (Input.GetButtonDown("Jump"))
+        if (jumpAction.WasPressedThisFrame())
         {
             if (controller.isGrounded)
             {
