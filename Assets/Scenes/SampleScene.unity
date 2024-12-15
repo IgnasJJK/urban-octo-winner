@@ -632,12 +632,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraObj: {fileID: 330585543}
+  capsuleObj: {fileID: 145763114}
   movementSpeed: 8
   gravity: 25
   pushStrength: 10
   jumpStrength: 10
   coyoteTime: 0.2
   maxAirJumpCount: 1
+  sillyAngle: 10
+  sillyWobble: 0.2
+  sillyMagnitude: 0.2
 --- !u!143 &545042029
 CharacterController:
   m_ObjectHideFlags: 0
@@ -656,8 +660,8 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
+  m_Height: 1.84
+  m_Radius: 0.42
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08

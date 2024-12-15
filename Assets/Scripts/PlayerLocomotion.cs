@@ -1,12 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 public class PlayerLocomotion : MonoBehaviour
 {
-
     CharacterController controller;
     [SerializeField] GameObject cameraObj;
+    [SerializeField] GameObject capsuleObj;
 
     [Header("Movement")]
     [SerializeField] float movementSpeed = 10f;
@@ -26,7 +27,6 @@ public class PlayerLocomotion : MonoBehaviour
 
     InputAction movementAction;
     InputAction jumpAction;
-
 
     void Start()
     {
@@ -67,6 +67,8 @@ public class PlayerLocomotion : MonoBehaviour
 
         Vector2 movement = movementAction.ReadValue<Vector2>();
         Vector3 movementDelta = (movement.y * forward + movement.x * right) * movementSpeed * Time.deltaTime;
+
+        DoSillyMovementAnimation(movement);
 
 #region Vertical movement, jumps
         if (controller.isGrounded)
@@ -110,6 +112,37 @@ public class PlayerLocomotion : MonoBehaviour
 #endregion
 
         controller.Move(movementDelta);
+    }
+
+
+    [Header("Silly Movement Animation")]
+    [SerializeField] float sillyAngle = 5f;
+    [SerializeField] float sillyWobble = 0.2f;
+    [SerializeField] float sillyMagnitude = 0.2f;
+    float movementAnimationTimer = 0f;
+
+    private void DoSillyMovementAnimation(Vector2 movement)
+    {
+        if (capsuleObj == null) return;
+
+        if (movement == Vector2.zero || inAirTime > 0.1f)
+        {
+            movementAnimationTimer = 0;
+            capsuleObj.transform.localPosition = Vector3.Lerp(capsuleObj.transform.localPosition, Vector3.zero, 0.1f);
+            capsuleObj.transform.localRotation = Quaternion.Lerp(capsuleObj.transform.rotation, Quaternion.identity, 0.1f);
+            return;
+        }
+
+        movementAnimationTimer += Time.deltaTime;
+
+        float magnitude = Mathf.Sin(movementAnimationTimer * 10f);
+        float magnitudeB = Mathf.Sin(movementAnimationTimer * 10f + Mathf.PI);
+
+        Vector3 forward = cameraObj.transform.forward;
+        forward.y = 0;
+        capsuleObj.transform.localRotation = Quaternion.Euler(0, 0, sillyAngle * magnitude) * Quaternion.LookRotation(forward);
+
+        capsuleObj.transform.localPosition = new Vector3(magnitudeB * sillyWobble, Mathf.Abs(magnitude * sillyMagnitude), 0);
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
