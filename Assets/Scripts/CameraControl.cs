@@ -29,6 +29,8 @@ public class CameraControl : MonoBehaviour
         mouseLookAction = InputSystem.actions.FindAction("Look");
 
         distanceToTarget = startingDistanceToTarget;
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
