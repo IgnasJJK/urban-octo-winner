@@ -9,12 +9,12 @@ public class CameraControl : MonoBehaviour
 
     [SerializeField] float startingDistanceToTarget = 5f;
     [SerializeField] Vector2 lookSpeed = new Vector2(1.0f, 1.0f);
+    [SerializeField] float maxVerticalLookAngle = 70f;
 
-    bool invertVertical = true;
-    bool invertHorizontal = false;
+    public bool invertVertical = true;
+    public bool invertHorizontal = false;
 
-    [SerializeField] float distanceToTarget;
-
+    float distanceToTarget;
     // x -- rotation around x (pitch); y -- rotation around y (yaw)
     Vector2 angle;
 
@@ -31,8 +31,7 @@ public class CameraControl : MonoBehaviour
         // NOTE: Looking axes are correct. Moving the mouse horizontally (x), 
         // will rotate around the y axis. Analogous for vertical (y).
         angle.x += lookSpeed.x * mouseLook.y * (invertVertical ? -1 : 1);
-        // FIXME: Clamping to -89, 89 allows the camera to overshoot when looking from above.
-        angle.x = Mathf.Clamp(angle.x, -70f, 70f);
+        angle.x = Mathf.Clamp(angle.x, -maxVerticalLookAngle, maxVerticalLookAngle);
         angle.y += lookSpeed.y * mouseLook.x * (invertHorizontal ? -1 : 1);
 
         Quaternion pitchYawRotation = Quaternion.Euler(angle.x, angle.y, 0);
