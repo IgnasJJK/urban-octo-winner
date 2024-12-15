@@ -140,7 +140,9 @@ public class PlayerLocomotion : MonoBehaviour
 
         Vector3 forward = cameraObj.transform.forward;
         forward.y = 0;
-        capsuleObj.transform.localRotation = Quaternion.Euler(0, 0, sillyAngle * magnitude) * Quaternion.LookRotation(forward);
+        capsuleObj.transform.localRotation = Quaternion.Lerp(
+            capsuleObj.transform.localRotation,
+            Quaternion.Euler(0, 0, sillyAngle * magnitude) * Quaternion.LookRotation(forward), 0.1f);
 
         capsuleObj.transform.localPosition = new Vector3(magnitudeB * sillyWobble, Mathf.Abs(magnitude * sillyMagnitude), 0);
     }
