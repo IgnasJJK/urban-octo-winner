@@ -1,16 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    int currentInventory = 0;
-
     [SerializeField] float ringRadius = 0.65f;
     [SerializeField] float rotationSpeed = 3.0f;
 
-    int inventorySize = 10;
+    [SerializeField] int maxDisplaySize = 24;
 
-    [SerializeField] GameObject[] objects;
-    int objectI;
+    List<GameObject> objects;
 
     [SerializeField] GameObject itemPrefab;
 
@@ -18,7 +16,7 @@ public class Inventory : MonoBehaviour
 
     void Start()
     {
-        objects = new GameObject[inventorySize];
+        objects = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -26,30 +24,32 @@ public class Inventory : MonoBehaviour
     {
         float collectibles = (float)PlayerState.instance.collectibles;
 
-
-        if (currentInventory != collectibles && collectibles > 0)
+        if (objects.Count != collectibles && collectibles > 0)
         {
-            rotationFraction = (2f * Mathf.PI) / collectibles;
+            rotationFraction = (2f * Mathf.PI) / Mathf.Min(collectibles, maxDisplaySize);
         }
 
-        // FIXME: Out of bounds when inventory size exceeded.
-        while (currentInventory < collectibles)
+        // Adjust number of objects.
+        // NOTE: Could do it with pooling.
         {
-            objects[objectI++] = Instantiate(itemPrefab, transform);
-            ++currentInventory;
+            while (objects.Count < collectibles)
+            {
+                GameObject i = Instantiate(itemPrefab, transform);
+                objects.Add(i);
+            }
+
+            while (objects.Count > collectibles)
+            {
+                int deleteId = objects.Count - 1;
+                Destroy(objects[deleteId]);
+                objects.RemoveAt(deleteId);
+            }
         }
 
-        while (currentInventory > collectibles)
+        // Animate each object.
+        for (int i = 0; i < objects.Count; ++i)
         {
-            Destroy(objects[--objectI]);
-            --currentInventory;
-        }
-
-        for (int i = 0; i < objectI; ++i)
-        {
-            Transform t = objects[i].transform;
-
-            t.localPosition = new Vector3(
+            objects[i].transform.localPosition = new Vector3(
                 Mathf.Cos(i*rotationFraction + Time.time * rotationSpeed) * ringRadius,
                 0,
                 Mathf.Sin(i*rotationFraction + Time.time * rotationSpeed) * ringRadius
