@@ -4,7 +4,7 @@ public class Collectible : MonoBehaviour
 {
     void OnTriggerEnter(Collider other)
     {
-        PlayerState.instance.AddCollectibles(3);
+        PlayerState.instance.collectibles += 3;
 
         Destroy(gameObject);
     }

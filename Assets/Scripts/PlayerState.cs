@@ -11,15 +11,5 @@ public class PlayerState
         }
     }
 
-    int collectibles = 0; 
-
-    public void AddCollectibles(int count = 0)
-    {
-        collectibles += count;
-    }
-
-    public int GetCollectibles()
-    {
-        return collectibles;
-    }
+    public int collectibles = 0; 
 }

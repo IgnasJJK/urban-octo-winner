@@ -24,7 +24,7 @@ public class Inventory : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float collectibles = (float)PlayerState.instance.GetCollectibles();
+        float collectibles = (float)PlayerState.instance.collectibles;
 
 
         if (currentInventory != collectibles && collectibles > 0)
@@ -41,7 +41,7 @@ public class Inventory : MonoBehaviour
 
         while (currentInventory > collectibles)
         {
-            Destroy(objects[objectI--]);
+            Destroy(objects[--objectI]);
             --currentInventory;
         }
 
