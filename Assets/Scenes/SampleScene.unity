@@ -1980,8 +1980,9 @@ MonoBehaviour:
   - {fileID: 5343043720184345882, guid: a57e9a8b0ba4c6a409e6ecd611a8f441, type: 3}
   - {fileID: 7581255600172159459, guid: 671483e2a1ada254090ad1d85b90282a, type: 3}
   - {fileID: 7748338919299671602, guid: 5f8ccfb1fa8521649864193eb7d58311, type: 3}
+  - {fileID: 5616035150039318121, guid: 83a63dfbb5a12704c8236bef267256b3, type: 3}
   forceGenerate: 0
-  forceGenerateRoomId: 4
+  forceGenerateRoomId: 5
 --- !u!4 &1344986474
 Transform:
   m_ObjectHideFlags: 0
