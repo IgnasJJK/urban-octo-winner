@@ -8,18 +8,12 @@ public class Inventory : MonoBehaviour
 
     [SerializeField] int maxDisplaySize = 24;
 
-    List<GameObject> objects;
+    List<GameObject> objects = new List<GameObject>();
 
     [SerializeField] GameObject itemPrefab;
 
     float rotationFraction = 0f;
 
-    void Start()
-    {
-        objects = new List<GameObject>();
-    }
-
-    // Update is called once per frame
     void Update()
     {
         float collectibles = (float)PlayerState.instance.collectibles;
@@ -30,7 +24,7 @@ public class Inventory : MonoBehaviour
         }
 
         // Adjust number of objects.
-        // NOTE: Could do it with pooling.
+        // TODO: Disabling excess objects (and re-enabling as needed) might be more optimal.
         {
             while (objects.Count < collectibles)
             {

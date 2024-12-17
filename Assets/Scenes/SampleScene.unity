@@ -705,7 +705,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   focalPoint: {fileID: 792513891}
-  startingDistanceToTarget: 8
+  distanceToTarget: 8
   lookSpeed: {x: 0.4, y: 0.4}
   minVerticalLookAngle: -60
   maxVerticalLookAngle: 70

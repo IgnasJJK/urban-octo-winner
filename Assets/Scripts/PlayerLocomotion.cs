@@ -7,25 +7,24 @@ public class PlayerLocomotion : MonoBehaviour
 {
     CharacterController controller;
     [SerializeField] GameObject cameraObj;
-    [SerializeField] GameObject capsuleObj;
+    [SerializeField] GameObject capsuleObj; // Player object (for wobble)
 
     [Header("Movement")]
     [SerializeField] float movementSpeed = 10f;
-    [SerializeField] float gravity = 9.81f;
+    [SerializeField] float gravity = 9.81f; // -Y acceleration
     [Header("Interaction")]
-    [SerializeField] float pushStrength = 10.0f;
+    [SerializeField] float pushStrength = 10.0f; // Multiplier to force applied to rigidbodies.
     [Header("Jump")]
     [SerializeField] float jumpStrength = 5.0f;
     [SerializeField] float coyoteTime = 0.2f;
-    [SerializeField] float maxAirJumpCount = 2;
+    [SerializeField] float maxAirJumpCount = 2; // Extra jumps in addition to the jump-from-ground.
 
     float verticalVelocity = 0;
     float inAirTime = 0;
     float inAirJumps = 0;
+    bool coyoteJumped;
 
     Quaternion targetRotation;
-
-    bool coyoteJumped;
 
     InputAction movementAction;
     InputAction jumpAction;
@@ -50,6 +49,8 @@ public class PlayerLocomotion : MonoBehaviour
     void Update()
     {
 #if UNITY_EDITOR
+        // OBSOLETE: Unnecessary option to allow movement without having a camera reference.
+
         Vector3 forward, right;
         if (cameraObj == null)
         {
@@ -159,7 +160,11 @@ public class PlayerLocomotion : MonoBehaviour
         float mA = Mathf.Sin(movementAnimationTimer * 10f);
         float mB = Mathf.Sin(movementAnimationTimer * 10f + Mathf.PI);
 
-        // FIXME: Semi-working hack here. Wobble doesn't quite work right when facing in X or -X direction.
+        // FIXME: Semi-working hack here. The first iteration of this made the player wobble only
+        // on the X axis, which made it nearly invisible when facing in X or -X direction.
+        // 
+        // Now the wobble works when looking from all angles, but sometimes the side-to-side
+        // movement and rotation go out of sync, which makes the wobble inconsistent.
         float forwardDir = Vector3.Dot(forward, Vector3.forward);
         forwardDir = forwardDir >= 0 ? 1 : -1;
 
