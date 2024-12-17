@@ -5,6 +5,11 @@ public class ExitDoor : MonoBehaviour
 {
     void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.layer != 10)
+        {
+            return;
+        }
+
         if (PlayerState.instance.collectibles == 0)
         {
             return;
