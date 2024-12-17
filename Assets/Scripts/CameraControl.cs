@@ -51,7 +51,8 @@ public class CameraControl : MonoBehaviour
 
         if(Physics.Raycast(focalPoint.transform.position, targetPosition - focalPoint.transform.position, out RaycastHit hitInfo, distanceToTarget, environmentLayerMask))
         {
-            targetPosition = hitInfo.point;
+            Vector3 offsetFromWall = ((focalPoint.transform.position - hitInfo.point) * 0.03f);
+            targetPosition = hitInfo.point + offsetFromWall;
         }
         
         transform.position = Vector3.Lerp(transform.position, targetPosition, smoothingSpeed);
