@@ -14,6 +14,8 @@ public class LevelManager : MonoBehaviour
     public int forceGenerateRoomId = 0;
 #endif
 
+    int lastGeneratedId = -1;
+
     void Awake()
     {
         _instance = this;
@@ -21,15 +23,23 @@ public class LevelManager : MonoBehaviour
 
     public void GenerateRoom(Vector3 position, Quaternion rotation)
     {
-#if UNITY_EDITOR
-        int randomRoomId = Mathf.Clamp(forceGenerateRoomId, 0, roomPrefabs.Count);
-        if (!forceGenerate)
+        int randomRoomId;
+        do
         {
-            randomRoomId = Random.Range(0, roomPrefabs.Count);
-        }
+#if UNITY_EDITOR
+            if (forceGenerate)
+            {
+                randomRoomId = Mathf.Clamp(forceGenerateRoomId, 0, roomPrefabs.Count);
+                break;
+            }
+            else randomRoomId = Random.Range(0, roomPrefabs.Count);
 #else
-        int randomRoomId = Random.Range(0, roomPrefabs.Count);
+            randomRoomId = Random.Range(0, roomPrefabs.Count);
 #endif
+        }
+        while (randomRoomId == lastGeneratedId && roomPrefabs.Count > 1);
+
         Instantiate(roomPrefabs[randomRoomId], position, rotation);
+        lastGeneratedId = randomRoomId;
     }
 }
