@@ -10,7 +10,7 @@ public class ExitDoor : MonoBehaviour
             return;
         }
 
-        LevelManager.instance.GenerateRoom(transform.position + (transform.forward * 5f), transform.rotation);
+        LevelManager.instance.GenerateRoom(transform.position, transform.rotation);
 
         --PlayerState.instance.collectibles;
         Destroy(this.gameObject);
